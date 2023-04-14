@@ -1,0 +1,9 @@
+Host pi
+    HostName 192.168.43.207
+    User pi
+    Port 22
+
+Host XMU_Server
+    HostName 59.77.8.124
+    User cs202767
+    Port 10022
