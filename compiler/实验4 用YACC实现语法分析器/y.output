@@ -1,0 +1,721 @@
+   0  $accept : program $end
+
+   1  program : block
+
+   2  block : '{' stmts '}'
+
+   3  stmts : stmt stmts
+   4        |
+
+   5  stmt : matched_stmt
+   6       | unmatched_stmt
+
+   7  matched_stmt : BREAK_TKN ';'
+   8               | block
+   9               | ID_TKN '=' expr ';'
+  10               | DO_TKN matched_stmt WHILE_TKN '(' bool ')' ';'
+  11               | WHILE_TKN '(' bool ')' matched_stmt
+  12               | IF_TKN '(' bool ')' matched_stmt ELSE_TKN matched_stmt
+
+  13  unmatched_stmt : IF_TKN '(' bool ')' matched_stmt
+  14                 | IF_TKN '(' bool ')' unmatched_stmt
+  15                 | IF_TKN '(' bool ')' matched_stmt ELSE_TKN unmatched_stmt
+
+  16  bool : expr RELOP_TKN expr
+  17       | expr
+
+  18  expr : expr '+' term
+  19       | expr '-' term
+  20       | term
+
+  21  term : term '*' factor
+  22       | term '/' factor
+  23       | factor
+
+  24  factor :
+  25         | '(' expr ')'
+  26         | ID_TKN
+  27         | NUM_TKN
+
+state 0
+	$accept : . program $end  (0)
+
+	'{'  shift 1
+	.  error
+
+	program  goto 2
+	block  goto 3
+
+
+state 1
+	block : '{' . stmts '}'  (2)
+	stmts : .  (4)
+
+	ID_TKN  shift 4
+	IF_TKN  shift 5
+	WHILE_TKN  shift 6
+	DO_TKN  shift 7
+	BREAK_TKN  shift 8
+	'{'  shift 1
+	'}'  reduce 4
+
+	block  goto 9
+	stmts  goto 10
+	stmt  goto 11
+	matched_stmt  goto 12
+	unmatched_stmt  goto 13
+
+
+state 2
+	$accept : program . $end  (0)
+
+	$end  accept
+
+
+state 3
+	program : block .  (1)
+
+	.  reduce 1
+
+
+state 4
+	matched_stmt : ID_TKN . '=' expr ';'  (9)
+
+	'='  shift 14
+	.  error
+
+
+state 5
+	matched_stmt : IF_TKN . '(' bool ')' matched_stmt ELSE_TKN matched_stmt  (12)
+	unmatched_stmt : IF_TKN . '(' bool ')' matched_stmt  (13)
+	unmatched_stmt : IF_TKN . '(' bool ')' unmatched_stmt  (14)
+	unmatched_stmt : IF_TKN . '(' bool ')' matched_stmt ELSE_TKN unmatched_stmt  (15)
+
+	'('  shift 15
+	.  error
+
+
+state 6
+	matched_stmt : WHILE_TKN . '(' bool ')' matched_stmt  (11)
+
+	'('  shift 16
+	.  error
+
+
+state 7
+	matched_stmt : DO_TKN . matched_stmt WHILE_TKN '(' bool ')' ';'  (10)
+
+	ID_TKN  shift 4
+	IF_TKN  shift 17
+	WHILE_TKN  shift 6
+	DO_TKN  shift 7
+	BREAK_TKN  shift 8
+	'{'  shift 1
+	.  error
+
+	block  goto 9
+	matched_stmt  goto 18
+
+
+state 8
+	matched_stmt : BREAK_TKN . ';'  (7)
+
+	';'  shift 19
+	.  error
+
+
+state 9
+	matched_stmt : block .  (8)
+
+	.  reduce 8
+
+
+state 10
+	block : '{' stmts . '}'  (2)
+
+	'}'  shift 20
+	.  error
+
+
+state 11
+	stmts : stmt . stmts  (3)
+	stmts : .  (4)
+
+	ID_TKN  shift 4
+	IF_TKN  shift 5
+	WHILE_TKN  shift 6
+	DO_TKN  shift 7
+	BREAK_TKN  shift 8
+	'{'  shift 1
+	'}'  reduce 4
+
+	block  goto 9
+	stmts  goto 21
+	stmt  goto 11
+	matched_stmt  goto 12
+	unmatched_stmt  goto 13
+
+
+state 12
+	stmt : matched_stmt .  (5)
+
+	.  reduce 5
+
+
+state 13
+	stmt : unmatched_stmt .  (6)
+
+	.  reduce 6
+
+
+state 14
+	matched_stmt : ID_TKN '=' . expr ';'  (9)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	';'  reduce 24
+
+	expr  goto 25
+	term  goto 26
+	factor  goto 27
+
+
+state 15
+	matched_stmt : IF_TKN '(' . bool ')' matched_stmt ELSE_TKN matched_stmt  (12)
+	unmatched_stmt : IF_TKN '(' . bool ')' matched_stmt  (13)
+	unmatched_stmt : IF_TKN '(' . bool ')' unmatched_stmt  (14)
+	unmatched_stmt : IF_TKN '(' . bool ')' matched_stmt ELSE_TKN unmatched_stmt  (15)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	RELOP_TKN  reduce 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	')'  reduce 24
+
+	expr  goto 28
+	bool  goto 29
+	term  goto 26
+	factor  goto 27
+
+
+state 16
+	matched_stmt : WHILE_TKN '(' . bool ')' matched_stmt  (11)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	RELOP_TKN  reduce 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	')'  reduce 24
+
+	expr  goto 28
+	bool  goto 30
+	term  goto 26
+	factor  goto 27
+
+
+state 17
+	matched_stmt : IF_TKN . '(' bool ')' matched_stmt ELSE_TKN matched_stmt  (12)
+
+	'('  shift 31
+	.  error
+
+
+state 18
+	matched_stmt : DO_TKN matched_stmt . WHILE_TKN '(' bool ')' ';'  (10)
+
+	WHILE_TKN  shift 32
+	.  error
+
+
+state 19
+	matched_stmt : BREAK_TKN ';' .  (7)
+
+	.  reduce 7
+
+
+state 20
+	block : '{' stmts '}' .  (2)
+
+	.  reduce 2
+
+
+state 21
+	stmts : stmt stmts .  (3)
+
+	.  reduce 3
+
+
+state 22
+	factor : NUM_TKN .  (27)
+
+	.  reduce 27
+
+
+state 23
+	factor : ID_TKN .  (26)
+
+	.  reduce 26
+
+
+state 24
+	factor : '(' . expr ')'  (25)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	')'  reduce 24
+
+	expr  goto 33
+	term  goto 26
+	factor  goto 27
+
+
+state 25
+	matched_stmt : ID_TKN '=' expr . ';'  (9)
+	expr : expr . '+' term  (18)
+	expr : expr . '-' term  (19)
+
+	'+'  shift 34
+	'-'  shift 35
+	';'  shift 36
+	.  error
+
+
+state 26
+	expr : term .  (20)
+	term : term . '*' factor  (21)
+	term : term . '/' factor  (22)
+
+	'*'  shift 37
+	'/'  shift 38
+	RELOP_TKN  reduce 20
+	'+'  reduce 20
+	'-'  reduce 20
+	';'  reduce 20
+	')'  reduce 20
+
+
+state 27
+	term : factor .  (23)
+
+	.  reduce 23
+
+
+state 28
+	bool : expr . RELOP_TKN expr  (16)
+	bool : expr .  (17)
+	expr : expr . '+' term  (18)
+	expr : expr . '-' term  (19)
+
+	RELOP_TKN  shift 39
+	'+'  shift 34
+	'-'  shift 35
+	')'  reduce 17
+
+
+state 29
+	matched_stmt : IF_TKN '(' bool . ')' matched_stmt ELSE_TKN matched_stmt  (12)
+	unmatched_stmt : IF_TKN '(' bool . ')' matched_stmt  (13)
+	unmatched_stmt : IF_TKN '(' bool . ')' unmatched_stmt  (14)
+	unmatched_stmt : IF_TKN '(' bool . ')' matched_stmt ELSE_TKN unmatched_stmt  (15)
+
+	')'  shift 40
+	.  error
+
+
+state 30
+	matched_stmt : WHILE_TKN '(' bool . ')' matched_stmt  (11)
+
+	')'  shift 41
+	.  error
+
+
+state 31
+	matched_stmt : IF_TKN '(' . bool ')' matched_stmt ELSE_TKN matched_stmt  (12)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	RELOP_TKN  reduce 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	')'  reduce 24
+
+	expr  goto 28
+	bool  goto 42
+	term  goto 26
+	factor  goto 27
+
+
+state 32
+	matched_stmt : DO_TKN matched_stmt WHILE_TKN . '(' bool ')' ';'  (10)
+
+	'('  shift 43
+	.  error
+
+
+state 33
+	expr : expr . '+' term  (18)
+	expr : expr . '-' term  (19)
+	factor : '(' expr . ')'  (25)
+
+	'+'  shift 34
+	'-'  shift 35
+	')'  shift 44
+	.  error
+
+
+state 34
+	expr : expr '+' . term  (18)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	RELOP_TKN  reduce 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	';'  reduce 24
+	')'  reduce 24
+
+	term  goto 45
+	factor  goto 27
+
+
+state 35
+	expr : expr '-' . term  (19)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	RELOP_TKN  reduce 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	';'  reduce 24
+	')'  reduce 24
+
+	term  goto 46
+	factor  goto 27
+
+
+state 36
+	matched_stmt : ID_TKN '=' expr ';' .  (9)
+
+	.  reduce 9
+
+
+state 37
+	term : term '*' . factor  (21)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	RELOP_TKN  reduce 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	';'  reduce 24
+	')'  reduce 24
+
+	factor  goto 47
+
+
+state 38
+	term : term '/' . factor  (22)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	RELOP_TKN  reduce 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	';'  reduce 24
+	')'  reduce 24
+
+	factor  goto 48
+
+
+state 39
+	bool : expr RELOP_TKN . expr  (16)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	')'  reduce 24
+
+	expr  goto 49
+	term  goto 26
+	factor  goto 27
+
+
+state 40
+	matched_stmt : IF_TKN '(' bool ')' . matched_stmt ELSE_TKN matched_stmt  (12)
+	unmatched_stmt : IF_TKN '(' bool ')' . matched_stmt  (13)
+	unmatched_stmt : IF_TKN '(' bool ')' . unmatched_stmt  (14)
+	unmatched_stmt : IF_TKN '(' bool ')' . matched_stmt ELSE_TKN unmatched_stmt  (15)
+
+	ID_TKN  shift 4
+	IF_TKN  shift 5
+	WHILE_TKN  shift 6
+	DO_TKN  shift 7
+	BREAK_TKN  shift 8
+	'{'  shift 1
+	.  error
+
+	block  goto 9
+	matched_stmt  goto 50
+	unmatched_stmt  goto 51
+
+
+state 41
+	matched_stmt : WHILE_TKN '(' bool ')' . matched_stmt  (11)
+
+	ID_TKN  shift 4
+	IF_TKN  shift 17
+	WHILE_TKN  shift 6
+	DO_TKN  shift 7
+	BREAK_TKN  shift 8
+	'{'  shift 1
+	.  error
+
+	block  goto 9
+	matched_stmt  goto 52
+
+
+state 42
+	matched_stmt : IF_TKN '(' bool . ')' matched_stmt ELSE_TKN matched_stmt  (12)
+
+	')'  shift 53
+	.  error
+
+
+state 43
+	matched_stmt : DO_TKN matched_stmt WHILE_TKN '(' . bool ')' ';'  (10)
+	factor : .  (24)
+
+	NUM_TKN  shift 22
+	ID_TKN  shift 23
+	'('  shift 24
+	RELOP_TKN  reduce 24
+	'+'  reduce 24
+	'-'  reduce 24
+	'*'  reduce 24
+	'/'  reduce 24
+	')'  reduce 24
+
+	expr  goto 28
+	bool  goto 54
+	term  goto 26
+	factor  goto 27
+
+
+state 44
+	factor : '(' expr ')' .  (25)
+
+	.  reduce 25
+
+
+state 45
+	expr : expr '+' term .  (18)
+	term : term . '*' factor  (21)
+	term : term . '/' factor  (22)
+
+	'*'  shift 37
+	'/'  shift 38
+	RELOP_TKN  reduce 18
+	'+'  reduce 18
+	'-'  reduce 18
+	';'  reduce 18
+	')'  reduce 18
+
+
+state 46
+	expr : expr '-' term .  (19)
+	term : term . '*' factor  (21)
+	term : term . '/' factor  (22)
+
+	'*'  shift 37
+	'/'  shift 38
+	RELOP_TKN  reduce 19
+	'+'  reduce 19
+	'-'  reduce 19
+	';'  reduce 19
+	')'  reduce 19
+
+
+state 47
+	term : term '*' factor .  (21)
+
+	.  reduce 21
+
+
+state 48
+	term : term '/' factor .  (22)
+
+	.  reduce 22
+
+
+state 49
+	bool : expr RELOP_TKN expr .  (16)
+	expr : expr . '+' term  (18)
+	expr : expr . '-' term  (19)
+
+	'+'  shift 34
+	'-'  shift 35
+	')'  reduce 16
+
+
+state 50
+	matched_stmt : IF_TKN '(' bool ')' matched_stmt . ELSE_TKN matched_stmt  (12)
+	unmatched_stmt : IF_TKN '(' bool ')' matched_stmt .  (13)
+	unmatched_stmt : IF_TKN '(' bool ')' matched_stmt . ELSE_TKN unmatched_stmt  (15)
+
+	ELSE_TKN  shift 55
+	ID_TKN  reduce 13
+	IF_TKN  reduce 13
+	WHILE_TKN  reduce 13
+	DO_TKN  reduce 13
+	BREAK_TKN  reduce 13
+	'{'  reduce 13
+	'}'  reduce 13
+
+
+state 51
+	unmatched_stmt : IF_TKN '(' bool ')' unmatched_stmt .  (14)
+
+	.  reduce 14
+
+
+state 52
+	matched_stmt : WHILE_TKN '(' bool ')' matched_stmt .  (11)
+
+	.  reduce 11
+
+
+state 53
+	matched_stmt : IF_TKN '(' bool ')' . matched_stmt ELSE_TKN matched_stmt  (12)
+
+	ID_TKN  shift 4
+	IF_TKN  shift 17
+	WHILE_TKN  shift 6
+	DO_TKN  shift 7
+	BREAK_TKN  shift 8
+	'{'  shift 1
+	.  error
+
+	block  goto 9
+	matched_stmt  goto 56
+
+
+state 54
+	matched_stmt : DO_TKN matched_stmt WHILE_TKN '(' bool . ')' ';'  (10)
+
+	')'  shift 57
+	.  error
+
+
+state 55
+	matched_stmt : IF_TKN '(' bool ')' matched_stmt ELSE_TKN . matched_stmt  (12)
+	unmatched_stmt : IF_TKN '(' bool ')' matched_stmt ELSE_TKN . unmatched_stmt  (15)
+
+	ID_TKN  shift 4
+	IF_TKN  shift 5
+	WHILE_TKN  shift 6
+	DO_TKN  shift 7
+	BREAK_TKN  shift 8
+	'{'  shift 1
+	.  error
+
+	block  goto 9
+	matched_stmt  goto 58
+	unmatched_stmt  goto 59
+
+
+state 56
+	matched_stmt : IF_TKN '(' bool ')' matched_stmt . ELSE_TKN matched_stmt  (12)
+
+	ELSE_TKN  shift 60
+	.  error
+
+
+state 57
+	matched_stmt : DO_TKN matched_stmt WHILE_TKN '(' bool ')' . ';'  (10)
+
+	';'  shift 61
+	.  error
+
+
+state 58
+	matched_stmt : IF_TKN '(' bool ')' matched_stmt ELSE_TKN matched_stmt .  (12)
+
+	.  reduce 12
+
+
+state 59
+	unmatched_stmt : IF_TKN '(' bool ')' matched_stmt ELSE_TKN unmatched_stmt .  (15)
+
+	.  reduce 15
+
+
+state 60
+	matched_stmt : IF_TKN '(' bool ')' matched_stmt ELSE_TKN . matched_stmt  (12)
+
+	ID_TKN  shift 4
+	IF_TKN  shift 17
+	WHILE_TKN  shift 6
+	DO_TKN  shift 7
+	BREAK_TKN  shift 8
+	'{'  shift 1
+	.  error
+
+	block  goto 9
+	matched_stmt  goto 58
+
+
+state 61
+	matched_stmt : DO_TKN matched_stmt WHILE_TKN '(' bool ')' ';' .  (10)
+
+	.  reduce 10
+
+
+25 terminals, 11 nonterminals
+28 grammar rules, 62 states

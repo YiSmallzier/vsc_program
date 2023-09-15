@@ -1,0 +1,18 @@
+{
+    i = 2;
+    sum = 0;
+    while(i <= 100) {
+        sum = sum + i;
+        i=i + 2;
+        if(i % 50 == 0) break;
+        if(i >= 1) {
+            i = i + 1;
+        }
+        else if(i <= 2) {
+            i = i + 2;
+        }
+        else {
+            i = i + 3;
+        }
+    }
+}

@@ -1,0 +1,19 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+#define NUM_TKN 257
+#define ID_TKN 258
+#define IF_TKN 259
+#define WHILE_TKN 260
+#define DO_TKN 261
+#define BREAK_TKN 262
+#define ELSE_TKN 263
+#define RELOP_TKN 264
+#define TRUE_TKN 265
+#define FALSE_TKN 266
+#define BASIC_TKN 267
+
+
+
+

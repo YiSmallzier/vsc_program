@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "iosfwd": "cpp"
+    },
+    "rust-analyzer.linkedProjects": ["C:/Users/YiSmallzier/Documents/vscode/rust_greeting/greeting/Cargo.toml"]
+}

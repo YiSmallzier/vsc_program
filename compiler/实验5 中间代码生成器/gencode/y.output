@@ -1,0 +1,1083 @@
+   0  $accept : program $end
+
+   1  program : block
+
+   2  block : '{' blockM1 decls stmts blockM2 '}'
+
+   3  blockM1 :
+
+   4  blockM2 :
+
+   5  decls : decls decl
+   6        |
+
+   7  decl : type ID ';'
+
+   8  type : BASIC
+
+   9  stmts : stmts stmt
+  10        |
+
+  11  stmt : matched_stmt
+  12       | unmatched_stmt
+
+  13  matched_stmt : ID '=' expr ';'
+  14               | IF '(' bool ')' matched_stmt ELSE matched_stmt
+  15               | WHILE '(' bool ')' matched_stmt
+  16               | DO matched_stmt WHILE '(' bool ')' ';'
+  17               | BREAK ';'
+  18               | block
+
+  19  unmatched_stmt : IF '(' bool ')' stmt
+  20                 | IF '(' bool ')' matched_stmt ELSE unmatched_stmt
+
+  21  bool : bool OR join
+  22       | join
+
+  23  join : join AND equality
+  24       | equality
+
+  25  equality : equality RELOP_EQ rel
+  26           | equality RELOP_NEQ rel
+  27           | rel
+
+  28  rel : expr RELOP_LT expr
+  29      | expr RELOP_LE expr
+  30      | expr RELOP_GT expr
+  31      | expr RELOP_GE expr
+  32      | expr
+
+  33  expr : expr '+' term
+  34       | expr '-' term
+  35       | term
+
+  36  term : term '*' unary
+  37       | term '/' unary
+  38       | unary
+
+  39  unary : '!' unary
+  40        | '-' unary
+  41        | factor
+
+  42  factor : '(' expr ')'
+  43         | ID
+  44         | CONST
+
+state 0
+	$accept : . program $end  (0)
+
+	'{'  shift 1
+	.  error
+
+	program  goto 2
+	block  goto 3
+
+
+state 1
+	block : '{' . blockM1 decls stmts blockM2 '}'  (2)
+	blockM1 : .  (3)
+
+	.  reduce 3
+
+	blockM1  goto 4
+
+
+state 2
+	$accept : program . $end  (0)
+
+	$end  accept
+
+
+state 3
+	program : block .  (1)
+
+	.  reduce 1
+
+
+state 4
+	block : '{' blockM1 . decls stmts blockM2 '}'  (2)
+	decls : .  (6)
+
+	.  reduce 6
+
+	decls  goto 5
+
+
+state 5
+	block : '{' blockM1 decls . stmts blockM2 '}'  (2)
+	decls : decls . decl  (5)
+	stmts : .  (10)
+
+	BASIC  shift 6
+	ID  reduce 10
+	IF  reduce 10
+	WHILE  reduce 10
+	DO  reduce 10
+	BREAK  reduce 10
+	'{'  reduce 10
+	'}'  reduce 10
+
+	stmts  goto 7
+	decl  goto 8
+	type  goto 9
+
+
+state 6
+	type : BASIC .  (8)
+
+	.  reduce 8
+
+
+state 7
+	block : '{' blockM1 decls stmts . blockM2 '}'  (2)
+	stmts : stmts . stmt  (9)
+	blockM2 : .  (4)
+
+	ID  shift 10
+	IF  shift 11
+	WHILE  shift 12
+	DO  shift 13
+	BREAK  shift 14
+	'{'  shift 1
+	'}'  reduce 4
+
+	block  goto 15
+	blockM2  goto 16
+	stmt  goto 17
+	matched_stmt  goto 18
+	unmatched_stmt  goto 19
+
+
+state 8
+	decls : decls decl .  (5)
+
+	.  reduce 5
+
+
+state 9
+	decl : type . ID ';'  (7)
+
+	ID  shift 20
+	.  error
+
+
+state 10
+	matched_stmt : ID . '=' expr ';'  (13)
+
+	'='  shift 21
+	.  error
+
+
+state 11
+	matched_stmt : IF . '(' bool ')' matched_stmt ELSE matched_stmt  (14)
+	unmatched_stmt : IF . '(' bool ')' stmt  (19)
+	unmatched_stmt : IF . '(' bool ')' matched_stmt ELSE unmatched_stmt  (20)
+
+	'('  shift 22
+	.  error
+
+
+state 12
+	matched_stmt : WHILE . '(' bool ')' matched_stmt  (15)
+
+	'('  shift 23
+	.  error
+
+
+state 13
+	matched_stmt : DO . matched_stmt WHILE '(' bool ')' ';'  (16)
+
+	ID  shift 10
+	IF  shift 24
+	WHILE  shift 12
+	DO  shift 13
+	BREAK  shift 14
+	'{'  shift 1
+	.  error
+
+	block  goto 15
+	matched_stmt  goto 25
+
+
+state 14
+	matched_stmt : BREAK . ';'  (17)
+
+	';'  shift 26
+	.  error
+
+
+state 15
+	matched_stmt : block .  (18)
+
+	.  reduce 18
+
+
+state 16
+	block : '{' blockM1 decls stmts blockM2 . '}'  (2)
+
+	'}'  shift 27
+	.  error
+
+
+state 17
+	stmts : stmts stmt .  (9)
+
+	.  reduce 9
+
+
+state 18
+	stmt : matched_stmt .  (11)
+
+	.  reduce 11
+
+
+state 19
+	stmt : unmatched_stmt .  (12)
+
+	.  reduce 12
+
+
+state 20
+	decl : type ID . ';'  (7)
+
+	';'  shift 28
+	.  error
+
+
+state 21
+	matched_stmt : ID '=' . expr ';'  (13)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 34
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 22
+	matched_stmt : IF '(' . bool ')' matched_stmt ELSE matched_stmt  (14)
+	unmatched_stmt : IF '(' . bool ')' stmt  (19)
+	unmatched_stmt : IF '(' . bool ')' matched_stmt ELSE unmatched_stmt  (20)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 38
+	bool  goto 39
+	join  goto 40
+	equality  goto 41
+	rel  goto 42
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 23
+	matched_stmt : WHILE '(' . bool ')' matched_stmt  (15)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 38
+	bool  goto 43
+	join  goto 40
+	equality  goto 41
+	rel  goto 42
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 24
+	matched_stmt : IF . '(' bool ')' matched_stmt ELSE matched_stmt  (14)
+
+	'('  shift 44
+	.  error
+
+
+state 25
+	matched_stmt : DO matched_stmt . WHILE '(' bool ')' ';'  (16)
+
+	WHILE  shift 45
+	.  error
+
+
+state 26
+	matched_stmt : BREAK ';' .  (17)
+
+	.  reduce 17
+
+
+state 27
+	block : '{' blockM1 decls stmts blockM2 '}' .  (2)
+
+	.  reduce 2
+
+
+state 28
+	decl : type ID ';' .  (7)
+
+	.  reduce 7
+
+
+state 29
+	factor : CONST .  (44)
+
+	.  reduce 44
+
+
+state 30
+	factor : ID .  (43)
+
+	.  reduce 43
+
+
+state 31
+	unary : '-' . unary  (40)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	unary  goto 46
+	factor  goto 37
+
+
+state 32
+	unary : '!' . unary  (39)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	unary  goto 47
+	factor  goto 37
+
+
+state 33
+	factor : '(' . expr ')'  (42)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 48
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 34
+	matched_stmt : ID '=' expr . ';'  (13)
+	expr : expr . '+' term  (33)
+	expr : expr . '-' term  (34)
+
+	'+'  shift 49
+	'-'  shift 50
+	';'  shift 51
+	.  error
+
+
+state 35
+	expr : term .  (35)
+	term : term . '*' unary  (36)
+	term : term . '/' unary  (37)
+
+	'*'  shift 52
+	'/'  shift 53
+	RELOP_LT  reduce 35
+	RELOP_LE  reduce 35
+	RELOP_GT  reduce 35
+	RELOP_GE  reduce 35
+	RELOP_EQ  reduce 35
+	RELOP_NEQ  reduce 35
+	OR  reduce 35
+	AND  reduce 35
+	'+'  reduce 35
+	'-'  reduce 35
+	';'  reduce 35
+	')'  reduce 35
+
+
+state 36
+	term : unary .  (38)
+
+	.  reduce 38
+
+
+state 37
+	unary : factor .  (41)
+
+	.  reduce 41
+
+
+state 38
+	rel : expr . RELOP_LT expr  (28)
+	rel : expr . RELOP_LE expr  (29)
+	rel : expr . RELOP_GT expr  (30)
+	rel : expr . RELOP_GE expr  (31)
+	rel : expr .  (32)
+	expr : expr . '+' term  (33)
+	expr : expr . '-' term  (34)
+
+	RELOP_LT  shift 54
+	RELOP_LE  shift 55
+	RELOP_GT  shift 56
+	RELOP_GE  shift 57
+	'+'  shift 49
+	'-'  shift 50
+	RELOP_EQ  reduce 32
+	RELOP_NEQ  reduce 32
+	OR  reduce 32
+	AND  reduce 32
+	')'  reduce 32
+
+
+state 39
+	matched_stmt : IF '(' bool . ')' matched_stmt ELSE matched_stmt  (14)
+	unmatched_stmt : IF '(' bool . ')' stmt  (19)
+	unmatched_stmt : IF '(' bool . ')' matched_stmt ELSE unmatched_stmt  (20)
+	bool : bool . OR join  (21)
+
+	OR  shift 58
+	')'  shift 59
+	.  error
+
+
+state 40
+	bool : join .  (22)
+	join : join . AND equality  (23)
+
+	AND  shift 60
+	OR  reduce 22
+	')'  reduce 22
+
+
+state 41
+	join : equality .  (24)
+	equality : equality . RELOP_EQ rel  (25)
+	equality : equality . RELOP_NEQ rel  (26)
+
+	RELOP_EQ  shift 61
+	RELOP_NEQ  shift 62
+	OR  reduce 24
+	AND  reduce 24
+	')'  reduce 24
+
+
+state 42
+	equality : rel .  (27)
+
+	.  reduce 27
+
+
+state 43
+	matched_stmt : WHILE '(' bool . ')' matched_stmt  (15)
+	bool : bool . OR join  (21)
+
+	OR  shift 58
+	')'  shift 63
+	.  error
+
+
+state 44
+	matched_stmt : IF '(' . bool ')' matched_stmt ELSE matched_stmt  (14)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 38
+	bool  goto 64
+	join  goto 40
+	equality  goto 41
+	rel  goto 42
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 45
+	matched_stmt : DO matched_stmt WHILE . '(' bool ')' ';'  (16)
+
+	'('  shift 65
+	.  error
+
+
+state 46
+	unary : '-' unary .  (40)
+
+	.  reduce 40
+
+
+state 47
+	unary : '!' unary .  (39)
+
+	.  reduce 39
+
+
+state 48
+	expr : expr . '+' term  (33)
+	expr : expr . '-' term  (34)
+	factor : '(' expr . ')'  (42)
+
+	'+'  shift 49
+	'-'  shift 50
+	')'  shift 66
+	.  error
+
+
+state 49
+	expr : expr '+' . term  (33)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	term  goto 67
+	unary  goto 36
+	factor  goto 37
+
+
+state 50
+	expr : expr '-' . term  (34)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	term  goto 68
+	unary  goto 36
+	factor  goto 37
+
+
+state 51
+	matched_stmt : ID '=' expr ';' .  (13)
+
+	.  reduce 13
+
+
+state 52
+	term : term '*' . unary  (36)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	unary  goto 69
+	factor  goto 37
+
+
+state 53
+	term : term '/' . unary  (37)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	unary  goto 70
+	factor  goto 37
+
+
+state 54
+	rel : expr RELOP_LT . expr  (28)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 71
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 55
+	rel : expr RELOP_LE . expr  (29)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 72
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 56
+	rel : expr RELOP_GT . expr  (30)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 73
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 57
+	rel : expr RELOP_GE . expr  (31)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 74
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 58
+	bool : bool OR . join  (21)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 38
+	join  goto 75
+	equality  goto 41
+	rel  goto 42
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 59
+	matched_stmt : IF '(' bool ')' . matched_stmt ELSE matched_stmt  (14)
+	unmatched_stmt : IF '(' bool ')' . stmt  (19)
+	unmatched_stmt : IF '(' bool ')' . matched_stmt ELSE unmatched_stmt  (20)
+
+	ID  shift 10
+	IF  shift 11
+	WHILE  shift 12
+	DO  shift 13
+	BREAK  shift 14
+	'{'  shift 1
+	.  error
+
+	block  goto 15
+	stmt  goto 76
+	matched_stmt  goto 77
+	unmatched_stmt  goto 19
+
+
+state 60
+	join : join AND . equality  (23)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 38
+	equality  goto 78
+	rel  goto 42
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 61
+	equality : equality RELOP_EQ . rel  (25)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 38
+	rel  goto 79
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 62
+	equality : equality RELOP_NEQ . rel  (26)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 38
+	rel  goto 80
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 63
+	matched_stmt : WHILE '(' bool ')' . matched_stmt  (15)
+
+	ID  shift 10
+	IF  shift 24
+	WHILE  shift 12
+	DO  shift 13
+	BREAK  shift 14
+	'{'  shift 1
+	.  error
+
+	block  goto 15
+	matched_stmt  goto 81
+
+
+state 64
+	matched_stmt : IF '(' bool . ')' matched_stmt ELSE matched_stmt  (14)
+	bool : bool . OR join  (21)
+
+	OR  shift 58
+	')'  shift 82
+	.  error
+
+
+state 65
+	matched_stmt : DO matched_stmt WHILE '(' . bool ')' ';'  (16)
+
+	CONST  shift 29
+	ID  shift 30
+	'-'  shift 31
+	'!'  shift 32
+	'('  shift 33
+	.  error
+
+	expr  goto 38
+	bool  goto 83
+	join  goto 40
+	equality  goto 41
+	rel  goto 42
+	term  goto 35
+	unary  goto 36
+	factor  goto 37
+
+
+state 66
+	factor : '(' expr ')' .  (42)
+
+	.  reduce 42
+
+
+state 67
+	expr : expr '+' term .  (33)
+	term : term . '*' unary  (36)
+	term : term . '/' unary  (37)
+
+	'*'  shift 52
+	'/'  shift 53
+	RELOP_LT  reduce 33
+	RELOP_LE  reduce 33
+	RELOP_GT  reduce 33
+	RELOP_GE  reduce 33
+	RELOP_EQ  reduce 33
+	RELOP_NEQ  reduce 33
+	OR  reduce 33
+	AND  reduce 33
+	'+'  reduce 33
+	'-'  reduce 33
+	';'  reduce 33
+	')'  reduce 33
+
+
+state 68
+	expr : expr '-' term .  (34)
+	term : term . '*' unary  (36)
+	term : term . '/' unary  (37)
+
+	'*'  shift 52
+	'/'  shift 53
+	RELOP_LT  reduce 34
+	RELOP_LE  reduce 34
+	RELOP_GT  reduce 34
+	RELOP_GE  reduce 34
+	RELOP_EQ  reduce 34
+	RELOP_NEQ  reduce 34
+	OR  reduce 34
+	AND  reduce 34
+	'+'  reduce 34
+	'-'  reduce 34
+	';'  reduce 34
+	')'  reduce 34
+
+
+state 69
+	term : term '*' unary .  (36)
+
+	.  reduce 36
+
+
+state 70
+	term : term '/' unary .  (37)
+
+	.  reduce 37
+
+
+state 71
+	rel : expr RELOP_LT expr .  (28)
+	expr : expr . '+' term  (33)
+	expr : expr . '-' term  (34)
+
+	'+'  shift 49
+	'-'  shift 50
+	RELOP_EQ  reduce 28
+	RELOP_NEQ  reduce 28
+	OR  reduce 28
+	AND  reduce 28
+	')'  reduce 28
+
+
+state 72
+	rel : expr RELOP_LE expr .  (29)
+	expr : expr . '+' term  (33)
+	expr : expr . '-' term  (34)
+
+	'+'  shift 49
+	'-'  shift 50
+	RELOP_EQ  reduce 29
+	RELOP_NEQ  reduce 29
+	OR  reduce 29
+	AND  reduce 29
+	')'  reduce 29
+
+
+state 73
+	rel : expr RELOP_GT expr .  (30)
+	expr : expr . '+' term  (33)
+	expr : expr . '-' term  (34)
+
+	'+'  shift 49
+	'-'  shift 50
+	RELOP_EQ  reduce 30
+	RELOP_NEQ  reduce 30
+	OR  reduce 30
+	AND  reduce 30
+	')'  reduce 30
+
+
+state 74
+	rel : expr RELOP_GE expr .  (31)
+	expr : expr . '+' term  (33)
+	expr : expr . '-' term  (34)
+
+	'+'  shift 49
+	'-'  shift 50
+	RELOP_EQ  reduce 31
+	RELOP_NEQ  reduce 31
+	OR  reduce 31
+	AND  reduce 31
+	')'  reduce 31
+
+
+state 75
+	bool : bool OR join .  (21)
+	join : join . AND equality  (23)
+
+	AND  shift 60
+	OR  reduce 21
+	')'  reduce 21
+
+
+state 76
+	unmatched_stmt : IF '(' bool ')' stmt .  (19)
+
+	.  reduce 19
+
+
+state 77
+	stmt : matched_stmt .  (11)
+	matched_stmt : IF '(' bool ')' matched_stmt . ELSE matched_stmt  (14)
+	unmatched_stmt : IF '(' bool ')' matched_stmt . ELSE unmatched_stmt  (20)
+
+	ELSE  shift 84
+	ID  reduce 11
+	IF  reduce 11
+	WHILE  reduce 11
+	DO  reduce 11
+	BREAK  reduce 11
+	'{'  reduce 11
+	'}'  reduce 11
+
+
+state 78
+	join : join AND equality .  (23)
+	equality : equality . RELOP_EQ rel  (25)
+	equality : equality . RELOP_NEQ rel  (26)
+
+	RELOP_EQ  shift 61
+	RELOP_NEQ  shift 62
+	OR  reduce 23
+	AND  reduce 23
+	')'  reduce 23
+
+
+state 79
+	equality : equality RELOP_EQ rel .  (25)
+
+	.  reduce 25
+
+
+state 80
+	equality : equality RELOP_NEQ rel .  (26)
+
+	.  reduce 26
+
+
+state 81
+	matched_stmt : WHILE '(' bool ')' matched_stmt .  (15)
+
+	.  reduce 15
+
+
+state 82
+	matched_stmt : IF '(' bool ')' . matched_stmt ELSE matched_stmt  (14)
+
+	ID  shift 10
+	IF  shift 24
+	WHILE  shift 12
+	DO  shift 13
+	BREAK  shift 14
+	'{'  shift 1
+	.  error
+
+	block  goto 15
+	matched_stmt  goto 85
+
+
+state 83
+	matched_stmt : DO matched_stmt WHILE '(' bool . ')' ';'  (16)
+	bool : bool . OR join  (21)
+
+	OR  shift 58
+	')'  shift 86
+	.  error
+
+
+state 84
+	matched_stmt : IF '(' bool ')' matched_stmt ELSE . matched_stmt  (14)
+	unmatched_stmt : IF '(' bool ')' matched_stmt ELSE . unmatched_stmt  (20)
+
+	ID  shift 10
+	IF  shift 11
+	WHILE  shift 12
+	DO  shift 13
+	BREAK  shift 14
+	'{'  shift 1
+	.  error
+
+	block  goto 15
+	matched_stmt  goto 87
+	unmatched_stmt  goto 88
+
+
+state 85
+	matched_stmt : IF '(' bool ')' matched_stmt . ELSE matched_stmt  (14)
+
+	ELSE  shift 89
+	.  error
+
+
+state 86
+	matched_stmt : DO matched_stmt WHILE '(' bool ')' . ';'  (16)
+
+	';'  shift 90
+	.  error
+
+
+state 87
+	matched_stmt : IF '(' bool ')' matched_stmt ELSE matched_stmt .  (14)
+
+	.  reduce 14
+
+
+state 88
+	unmatched_stmt : IF '(' bool ')' matched_stmt ELSE unmatched_stmt .  (20)
+
+	.  reduce 20
+
+
+state 89
+	matched_stmt : IF '(' bool ')' matched_stmt ELSE . matched_stmt  (14)
+
+	ID  shift 10
+	IF  shift 24
+	WHILE  shift 12
+	DO  shift 13
+	BREAK  shift 14
+	'{'  shift 1
+	.  error
+
+	block  goto 15
+	matched_stmt  goto 87
+
+
+state 90
+	matched_stmt : DO matched_stmt WHILE '(' bool ')' ';' .  (16)
+
+	.  reduce 16
+
+
+30 terminals, 20 nonterminals
+45 grammar rules, 91 states

@@ -1,0 +1,23 @@
+### 构建一个Rust项目工程文件夹 
+Step1. 选择一个文件夹，打开终端
+
+Step2. 输入命令
+> cargo new greeting
+> //构建名为greeting的工程目录
+
+Step3. 按照以下顺序在终端输入命令：
+> cd ./greeting
+> cargo build
+> cargo run
+
+#### sloved from:
+https://www.runoob.com/rust/
+
+
+### Extension Problem of Rust-Analyser
+#### [Error Logs]
+> [ERROR rust_analyzer::main_loop] FetchWorkspaceError:
+> rust-analyzer failed to discover workspace
+#### [Solution]
+Add to ../.vscode/settings.json:
+> "rust-analyzer.linkedProjects": ["C:/Users/YiSmallzier/Documents/vscode/rust_greeting/greeting/Cargo.toml"]

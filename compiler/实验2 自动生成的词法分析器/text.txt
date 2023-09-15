@@ -1,0 +1,9 @@
+{  /* An example */
+    int int,j; float x; float[100] a;
+    while ( true) {
+        do i = i + 1; while ( a[i] < x); //test
+        if ( i >= j ) break;
+        x = a[i];
+    }
+    // this is a example
+}
